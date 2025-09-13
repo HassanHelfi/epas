@@ -76,3 +76,23 @@ services:
             - ./docker/redis_data:/date
         networks:
             - epas
+    #############################################################################
+    # Laravel Scheduler
+    #############################################################################
+    scheduler:
+        build:
+            context: .
+            args:
+                UID: ${UID}
+                GID: ${GID}
+        container_name: scheduler_epas
+        restart: unless-stopped
+        volumes:
+            - .:/var/www/app
+        command: sh -c "while true; do php /var/www/app/artisan schedule:run; sleep 60; done"
+        user: "${UID}:${GID}"
+        depends_on:
+            - mysql
+            - redis
+        networks:
+            - epas
